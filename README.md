@@ -85,6 +85,76 @@ XMR
 
 </details>
 
+## 编译与签名构建 / Build & Signing
+
+### 1. 准备工作
+
+* 确保已安装 Android SDK、NDK 以及 Go 环境（如需编译 libcore）。
+* 下载规则资源文件（GeoIP / GeoSite）：
+  ```bash
+  bash buildScript/lib/assets.sh
+  ```
+* 编译或准备 `libcore.aar`（如 `app/libs/libcore.aar` 不存在）：
+  ```bash
+  ./run lib core
+  ```
+
+### 2. 生成自签名密钥 (Self-sign Keystore)
+
+项目默认会在项目根目录下查找名为 `release.keystore` 的密钥文件。如果没有，可以使用 `keytool` 生成一个：
+
+```bash
+keytool -genkeypair -v \
+  -keystore release.keystore \
+  -alias my-key-alias \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000 \
+  -storepass your_password \
+  -keypass your_password
+```
+
+### 3. 配置签名参数
+
+在项目根目录的 `local.properties` 中添加签名信息（或者配置对应的环境变量）：
+
+```properties
+KEYSTORE_PASS=your_password
+ALIAS_NAME=my-key-alias
+ALIAS_PASS=your_password
+```
+
+> **注意**：如果之前运行过 Gradle 守护进程，修改 `local.properties` 后建议执行 `./gradlew --stop` 停止 daemon，以确保配置生效。
+
+可以通过以下命令检查签名配置是否正确识别：
+```bash
+./gradlew app:signingReport
+```
+查看 `Variant: ossRelease` 是否已成功关联到密钥且无报错。
+
+### 4. 命令行编译 Release APK
+
+执行以下命令构建 Release 版本（会自动按 ABI 进行切分，包含 arm64-v8a、armeabi-v7a 等）：
+
+```bash
+./gradlew app:assembleOssRelease
+```
+
+编译完成后，APK 文件输出在：
+```bash
+app/build/outputs/apk/oss/release/
+```
+若配置了签名，arm64 架构的文件名类似于 `NekoBox-<version>-arm64-v8a.apk`（未签名则会带有 `-unsigned.apk` 后缀）。
+
+### 5. 校验 APK 签名
+
+使用 Android SDK 的 `apksigner` 工具检查生成的 APK 签名：
+
+```bash
+$ANDROID_HOME/build-tools/<version>/apksigner verify --verbose app/build/outputs/apk/oss/release/*arm64-v8a*.apk
+```
+若签名成功，输出中会显示 `Verifies` 以及签名 Schemes（如 v1/v2/v3 signing: true）。
+
 ## Credits
 
 Core:
