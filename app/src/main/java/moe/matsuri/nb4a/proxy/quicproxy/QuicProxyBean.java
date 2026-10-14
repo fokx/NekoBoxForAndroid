@@ -47,6 +47,11 @@ public class QuicProxyBean extends AbstractBean {
     }
 
     @Override
+    public boolean canMapping() {
+        return true;
+    }
+
+    @Override
     public void serialize(ByteBufferOutput output) {
         output.writeInt(0);
         super.serialize(output);

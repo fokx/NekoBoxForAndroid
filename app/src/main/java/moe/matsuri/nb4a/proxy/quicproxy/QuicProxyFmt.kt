@@ -11,16 +11,20 @@ fun QuicProxyBean.buildQuicProxyConfig(port: Int): String {
     sb.append("socks5_listen = \"127.0.0.1:$port\"\n\n")
     sb.append("[[servers]]\n")
     sb.append("name = \"default\"\n")
-    sb.append("server_addr = \"${serverAddress.wrapIPV6Host()}\"\n")
-    sb.append("server_port = ${serverPort ?: 4433}\n")
+    sb.append("server_addr = \"${finalAddress.wrapIPV6Host()}\"\n")
+    sb.append("server_port = ${finalPort ?: 4433}\n")
     sb.append("auth_key = \"${authKey.replace("\\", "\\\\").replace("\"", "\\\"")}\"\n")
     val trans = if (!transport.isNullOrBlank()) transport else "quic"
     sb.append("transport = \"$trans\"\n")
     if (allowInsecure == true) {
         sb.append("insecure = true\n")
     }
-    if (!sni.isNullOrBlank()) {
-        sb.append("server_name = \"${sni.replace("\"", "\\\"")}\"\n")
+    var effectiveSni = sni
+    if (effectiveSni.isNullOrBlank() && finalAddress == "127.0.0.1" && !serverAddress.isNullOrBlank()) {
+        effectiveSni = serverAddress
+    }
+    if (!effectiveSni.isNullOrBlank()) {
+        sb.append("server_name = \"${effectiveSni.replace("\"", "\\\"")}\"\n")
     }
     if (!certFingerprint.isNullOrBlank()) {
         sb.append("cert_fingerprint = \"${certFingerprint.trim()}\"\n")
