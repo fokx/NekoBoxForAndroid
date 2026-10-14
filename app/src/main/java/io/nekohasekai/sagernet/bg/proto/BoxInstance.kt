@@ -16,6 +16,8 @@ import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
 import io.nekohasekai.sagernet.fmt.trojan_go.buildTrojanGoConfig
+import moe.matsuri.nb4a.proxy.quicproxy.QuicProxyBean
+import moe.matsuri.nb4a.proxy.quicproxy.buildQuicProxyConfig
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
 import kotlinx.coroutines.*
@@ -82,6 +84,11 @@ abstract class BoxInstance(
                                 cacheFiles.add(this)
                             }
                         }
+                    }
+
+                    is QuicProxyBean -> {
+                        initPlugin("quicproxy-plugin")
+                        pluginConfigs[port] = profile.type to bean.buildQuicProxyConfig(port)
                     }
                 }
             }
@@ -192,6 +199,25 @@ abstract class BoxInstance(
                         if (bean.protocol == HysteriaBean.PROTOCOL_FAKETCP) {
                             commands.addAll(0, listOf("su", "-c"))
                         }
+
+                        processes.start(commands)
+                    }
+
+                    bean is QuicProxyBean -> {
+                        val configFile = File(
+                            cacheDir, "quicproxy_" + SystemClock.elapsedRealtime() + ".toml"
+                        )
+
+                        configFile.parentFile?.mkdirs()
+                        configFile.writeText(config)
+                        cacheFiles.add(configFile)
+
+                        val commands = mutableListOf(
+                            initPlugin("quicproxy-plugin").path,
+                            "client",
+                            "--config",
+                            configFile.absolutePath
+                        )
 
                         processes.start(commands)
                     }

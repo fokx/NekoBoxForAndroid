@@ -35,6 +35,10 @@ import moe.matsuri.nb4a.SingBoxOptions.MultiplexOptions
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
 import moe.matsuri.nb4a.proxy.anytls.toUri
+import moe.matsuri.nb4a.proxy.quicproxy.QuicProxyBean
+import moe.matsuri.nb4a.proxy.quicproxy.QuicProxySettingsActivity
+import moe.matsuri.nb4a.proxy.quicproxy.buildQuicProxyConfig
+import moe.matsuri.nb4a.proxy.quicproxy.toUri
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.neko.*
@@ -68,6 +72,7 @@ data class ProxyEntity(
     var wgBean: WireGuardBean? = null,
     var shadowTLSBean: ShadowTLSBean? = null,
     var anyTLSBean: AnyTLSBean? = null,
+    var quicProxyBean: QuicProxyBean? = null,
     var chainBean: ChainBean? = null,
     var nekoBean: NekoBean? = null,
     var configBean: ConfigBean? = null,
@@ -90,6 +95,7 @@ data class ProxyEntity(
         const val TYPE_TUIC = 20
         const val TYPE_MIERU = 21
         const val TYPE_ANYTLS = 22
+        const val TYPE_QUICPROXY = 23
 
         const val TYPE_CONFIG = 998
         const val TYPE_NEKO = 999
@@ -174,6 +180,7 @@ data class ProxyEntity(
             TYPE_TUIC -> tuicBean = KryoConverters.tuicDeserialize(byteArray)
             TYPE_SHADOWTLS -> shadowTLSBean = KryoConverters.shadowTLSDeserialize(byteArray)
             TYPE_ANYTLS -> anyTLSBean = KryoConverters.anyTLSDeserialize(byteArray)
+            TYPE_QUICPROXY -> quicProxyBean = KryoConverters.quicProxyDeserialize(byteArray)
             TYPE_CHAIN -> chainBean = KryoConverters.chainDeserialize(byteArray)
             TYPE_NEKO -> nekoBean = KryoConverters.nekoDeserialize(byteArray)
             TYPE_CONFIG -> configBean = KryoConverters.configDeserialize(byteArray)
@@ -195,6 +202,7 @@ data class ProxyEntity(
         TYPE_TUIC -> "TUIC"
         TYPE_SHADOWTLS -> "ShadowTLS"
         TYPE_ANYTLS -> "AnyTLS"
+        TYPE_QUICPROXY -> "QuicProxy"
         TYPE_CHAIN -> chainName
         TYPE_NEKO -> nekoBean!!.displayType()
         TYPE_CONFIG -> configBean!!.displayType()
@@ -220,6 +228,7 @@ data class ProxyEntity(
             TYPE_TUIC -> tuicBean
             TYPE_SHADOWTLS -> shadowTLSBean
             TYPE_ANYTLS -> anyTLSBean
+            TYPE_QUICPROXY -> quicProxyBean
             TYPE_CHAIN -> chainBean
             TYPE_NEKO -> nekoBean
             TYPE_CONFIG -> configBean
@@ -257,6 +266,7 @@ data class ProxyEntity(
             is HysteriaBean -> toUri()
             is TuicBean -> toUri()
             is AnyTLSBean -> toUri()
+            is QuicProxyBean -> toUri()
             is NekoBean -> ""
             else -> toUniversalLink()
         }
@@ -296,6 +306,11 @@ data class ProxyEntity(
                                 append("\n\n")
                                 append(bean.buildHysteria1Config(port, null))
                             }
+
+                            is QuicProxyBean -> {
+                                append("\n\n")
+                                append(bean.buildQuicProxyConfig(port))
+                            }
                         }
                     }
                 }
@@ -309,6 +324,7 @@ data class ProxyEntity(
             TYPE_MIERU -> true
             TYPE_NAIVE -> true
             TYPE_HYSTERIA -> !hysteriaBean!!.canUseSingBox()
+            TYPE_QUICPROXY -> true
             TYPE_NEKO -> true
             else -> false
         }
@@ -357,6 +373,7 @@ data class ProxyEntity(
         tuicBean = null
         shadowTLSBean = null
         anyTLSBean = null
+        quicProxyBean = null
         chainBean = null
         configBean = null
         nekoBean = null
@@ -432,6 +449,11 @@ data class ProxyEntity(
                 anyTLSBean = bean
             }
 
+            is QuicProxyBean -> {
+                type = TYPE_QUICPROXY
+                quicProxyBean = bean
+            }
+
             is ChainBean -> {
                 type = TYPE_CHAIN
                 chainBean = bean
@@ -469,6 +491,7 @@ data class ProxyEntity(
                 TYPE_TUIC -> TuicSettingsActivity::class.java
                 TYPE_SHADOWTLS -> ShadowTLSSettingsActivity::class.java
                 TYPE_ANYTLS -> AnyTLSSettingsActivity::class.java
+                TYPE_QUICPROXY -> QuicProxySettingsActivity::class.java
                 TYPE_CHAIN -> ChainSettingsActivity::class.java
                 TYPE_CONFIG -> ConfigSettingActivity::class.java
                 else -> throw IllegalArgumentException()

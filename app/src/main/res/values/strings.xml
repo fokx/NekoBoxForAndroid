@@ -219,6 +219,11 @@
     <string name="action_mieru" translatable="false">Mieru</string>
     <string name="action_naive" translatable="false">Naïve</string>
     <string name="action_anytls" translatable="false">AnyTLS</string>
+    <string name="action_quicproxy" translatable="false">QuicProxy</string>
+    <string name="quicproxy_auth_key">Auth Key</string>
+    <string name="quicproxy_cert_fingerprint">Cert Fingerprint (SHA-256)</string>
+    <string name="quicproxy_transport">Transport Mode</string>
+    <string name="quicproxy_obfs_key">Obfuscation Key</string>
     <string name="action_hysteria" translatable="false">Hysteria</string>
     <string name="action_ssh" translatable="false">SSH</string>
     <string name="action_wireguard" translatable="false">WireGuard</string>

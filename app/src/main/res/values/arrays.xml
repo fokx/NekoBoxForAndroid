@@ -530,4 +530,16 @@
         <item>@string/sniff_override</item>
     </string-array>
 
+    <string-array name="quicproxy_transport_entry" translatable="false">
+        <item>Auto</item>
+        <item>QUIC</item>
+        <item>TCP</item>
+    </string-array>
+
+    <string-array name="quicproxy_transport_value" translatable="false">
+        <item>auto</item>
+        <item>quic</item>
+        <item>tcp</item>
+    </string-array>
+
 </resources>

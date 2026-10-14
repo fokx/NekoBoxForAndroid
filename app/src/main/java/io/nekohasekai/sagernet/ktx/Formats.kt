@@ -15,6 +15,7 @@ import io.nekohasekai.sagernet.fmt.tuic.parseTuic
 import io.nekohasekai.sagernet.fmt.trojan_go.parseTrojanGo
 import io.nekohasekai.sagernet.fmt.v2ray.parseV2Ray
 import moe.matsuri.nb4a.proxy.anytls.parseAnytls
+import moe.matsuri.nb4a.proxy.quicproxy.parseQuicproxy
 import moe.matsuri.nb4a.utils.JavaUtil.gson
 import moe.matsuri.nb4a.utils.Util
 import okhttp3.HttpUrl
@@ -214,6 +215,13 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
             Logs.d("Try parse anytls link: $this")
             runCatching {
                 entities.add(parseAnytls(this))
+            }.onFailure {
+                Logs.w(it)
+            }
+        } else if (startsWith("quicproxy://")) {
+            Logs.d("Try parse quicproxy link: $this")
+            runCatching {
+                entities.add(parseQuicproxy(this))
             }.onFailure {
                 Logs.w(it)
             }

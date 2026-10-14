@@ -22,6 +22,7 @@ import io.nekohasekai.sagernet.ktx.*
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
+import moe.matsuri.nb4a.proxy.quicproxy.QuicProxyBean
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.utils.Util
 import org.ini4j.Ini
@@ -511,6 +512,31 @@ object RawUpdater : GroupUpdater() {
                                         val alpn = (opt.value as? (List<String>))
                                         bean.alpn = alpn?.joinToString("\n")
                                     }
+                                }
+                            }
+                            proxies.add(bean)
+                        }
+
+                        "quicproxy" -> {
+                            val bean = QuicProxyBean()
+                            for (opt in proxy) {
+                                if (opt.value == null) continue
+                                when (opt.key.replace("_", "-")) {
+                                    "name" -> bean.name = opt.value.toString()
+                                    "server" -> bean.serverAddress = opt.value as String
+                                    "port" -> bean.serverPort = opt.value.toString().toInt()
+                                    "auth-key", "password", "key" -> bean.authKey = opt.value.toString()
+                                    "sni", "server-name" -> bean.sni = opt.value.toString()
+                                    "skip-cert-verify", "insecure", "allow-insecure" -> bean.allowInsecure =
+                                        opt.value.toString() == "true"
+                                    "cert-fingerprint", "fp", "fingerprint" -> bean.certFingerprint =
+                                        opt.value.toString()
+                                    "transport" -> bean.transport = opt.value.toString()
+                                    "alpn" -> {
+                                        val alpn = (opt.value as? (List<String>))
+                                        bean.alpn = alpn?.joinToString(",") ?: opt.value.toString()
+                                    }
+                                    "obfs", "obfs-key" -> bean.obfsKey = opt.value.toString()
                                 }
                             }
                             proxies.add(bean)

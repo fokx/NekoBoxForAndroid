@@ -499,4 +499,8 @@
     <string name="minimize">最小化</string>
     <string name="app_list_permission_denied">无法读取已安装的应用。\n这通常是由于系统限制了应用的读取权限（例如某些中国厂商系统）。\n请在系统设置中授予权限。</string>
     <string name="open_app_settings">打开系统设置</string>
+    <string name="quicproxy_auth_key">验证密钥 (Auth Key)</string>
+    <string name="quicproxy_cert_fingerprint">证书指纹 (SHA-256)</string>
+    <string name="quicproxy_transport">传输模式</string>
+    <string name="quicproxy_obfs_key">混淆密钥</string>
 </resources>

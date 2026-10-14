@@ -71,6 +71,7 @@ object PluginManager {
             return null
         }
         return when (pluginId) {
+            "quicproxy-plugin" -> soIfExist("libquicproxy.so")
             "hysteria-plugin" -> soIfExist("libhysteria.so")
             "hysteria2-plugin" -> soIfExist("libhysteria2.so")
             else -> null
